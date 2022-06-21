@@ -1,0 +1,12 @@
+{
+  "name": "Natours",
+  "version": "0.0.1",
+  "description": "Test project for course",
+  "main": "xxx.js",
+  "scripts": {
+    "start": "node xxx.js"
+  },
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
