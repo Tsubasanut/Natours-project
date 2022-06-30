@@ -26,17 +26,49 @@ function reloadStatic() {
   );
 }
 
-function returnErrorNoSuchID(res, id) {
-  return res
-    .contentType('application/json')
-    .status(404)
-    .json({
-      status: 'failure',
-      results: 0,
-      error: 'Invalid id: ' + id,
-      data: {},
-    });
-}
+//#endregion
+
+//#region Checks
+exports.CheckNewTour = (req, res, next) => {
+  let newId = toursSimple.slice(-1)[0].id + 1;
+  req.newTour = { ...req.body, id: newId };
+
+  //let's validate new tour (only obligatory fields)
+  let validProps = ['name', 'price'];
+  ////full validation agaist first existing object
+  //let validProps = [...Object.keys(toursSimple[0])]
+  let newTourValid = (prop) => {
+    return validProps.every((prop) => req.newTour.hasOwnProperty(prop));
+  };
+  if (!newTourValid()) {
+    return res
+      .contentType('application/json')
+      .status(400)
+      .json({
+        status: 'failure',
+        results: 0,
+        error: 'Incorrect tour format: ' + JSON.stringify(req.newTour),
+        data: {},
+      });
+  }
+  next();
+};
+
+exports.checkID = (req, res, next, val) => {
+  let requestedTour = toursSimple.filter((el) => el.id === +val)[0];
+  if (!requestedTour) {
+    return res
+      .contentType('application/json')
+      .status(404)
+      .json({
+        status: 'failure',
+        results: 0,
+        error: 'CheckID - Invalid id: ' + val,
+        data: {},
+      });
+  }
+  next();
+};
 //#endregion
 
 //#region Tours
@@ -50,9 +82,6 @@ exports.getAllTours = (req, res) => {
 
 exports.getOneTour = (req, res) => {
   let requestedTour = toursSimple.filter((el) => el.id === +req.params.id)[0];
-  if (!requestedTour) {
-    return returnErrorNoSuchID(res, req.params.id);
-  }
 
   res.contentType('application/json').status(200).json({
     status: 'success',
@@ -64,14 +93,10 @@ exports.getOneTour = (req, res) => {
 
 exports.createNewTour = (req, res) => {
   //console.log(req.body);
-
-  let newId = toursSimple.slice(-1).id + 1;
-  let newTour = { ...req.body, id: newId };
-
-  toursSimple.push(newTour);
+  toursSimple.push(req.newTour);
 
   res.status(201);
-  writeFullToursFile(res, toursSimple, { newTour });
+  writeFullToursFile(res, toursSimple, req.newTour);
 
   reloadStatic();
   /*
@@ -89,9 +114,6 @@ exports.createNewTour = (req, res) => {
 
 exports.patchTour = (req, res) => {
   let requestedTour = toursSimple.filter((el) => el.id === +req.params.id)[0];
-  if (!requestedTour) {
-    return returnErrorNoSuchID(res, req.params.id);
-  }
 
   //updating...
   _.merge(requestedTour, req.body);
@@ -113,9 +135,6 @@ exports.deleteTour = (req, res) => {
   let requestedTourIdx = toursSimple.findIndex(
     (el) => el.id === +req.params.id
   );
-  if (requestedTourIdx === -1) {
-    return returnErrorNoSuchID(res, req.params.id);
-  }
 
   let lengthBefore = toursSimple.length;
   toursSimple.splice(requestedTourIdx, 1);

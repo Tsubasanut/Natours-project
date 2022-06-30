@@ -1,24 +1,26 @@
 const express = require('express');
 const fs = require('fs');
 const morgan = require('morgan');
-const app = express();
-
 //imports
-const tourRouter = require('./routes/tours');
-const userRouter = require('./routes/users');
+const tourRouter = require('./routes/toursRoutes');
+const userRouter = require('./routes/usersRoutes');
 
-const PORT = 3000;
+const app = express();
 
 //#region Middleware
 app.use(morgan('dev'));
 app.use(express.json());
+app.use(express.static(`${__dirname}/public`));
+
+app.use('/api/V1/tours', tourRouter);
+app.use('/api/V1/users', userRouter);
+/*
 app.use((req, res, next) => {
   req.requestedAt = new Date().toISOString();
   next();
 });
-app.use('/api/V1/tours', tourRouter);
-app.use('/api/V1/users', userRouter);
-/* basic routing
+
+basic routing
 const routes = ['/', '/api'];
 app
   .route(routes)
@@ -31,20 +33,4 @@ app
 */
 //#endregion
 
-//#region helper functions
-
-//#endregion
-
-//#region Main handlers
-
-//#region Users
-
-//#endregion
-//#endregion
-
-//#region Server
-
-app.listen(PORT, () => {
-  console.log('listening on port ' + PORT + '...');
-});
-//#endregion
+module.exports = app;
