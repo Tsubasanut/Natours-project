@@ -1,0 +1,1 @@
+exports.mainDir = `${__dirname}`;
