@@ -1,14 +1,16 @@
 const express = require('express');
 const fs = require('fs');
 const morgan = require('morgan');
-//imports
+
 const tourRouter = require('./routes/toursRoutes');
 const userRouter = require('./routes/usersRoutes');
 
 const app = express();
 
 //#region Middleware
-app.use(morgan('dev'));
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 app.use(express.json());
 app.use(express.static(`${__dirname}/public`));
 

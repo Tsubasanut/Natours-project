@@ -4,11 +4,16 @@
   "description": "Test project for course",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js"
+    "start:dev": "SET NODE_ENV=development && node server.js",
+    "start:prod": "SET NODE_ENV=production && node server.js"
   },
   "dependencies": {
+    "dotenv": "^16.0.1",
     "express": "^4.18.1",
     "lodash": "^4.17.21",
     "morgan": "^1.10.0"
+  },
+  "devDependencies": {
+    "cross-env": "^7.0.3"
   }
 }

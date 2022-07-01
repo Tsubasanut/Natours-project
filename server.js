@@ -1,7 +1,9 @@
+//read the env BEFORE apps
+require('dotenv').config({ path: './config.env' });
 const app = require('./app');
 
-const PORT = 3000;
+const port = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log('listening on port ' + PORT + '...');
+app.listen(port, () => {
+  console.log('listening on port ' + port + '...');
 });
